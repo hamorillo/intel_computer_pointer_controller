@@ -21,6 +21,8 @@ def build_argparser():
     parser.add_argument("-pt", "--prob_threshold", type=float, default=0.5,
                         help="Probability threshold for detections faces"
                         "(0.5 by default)")
+    parser.add_argument("-d", "--debug", type=bool, default=False,
+                        help="Debug mode print and write images")
     return parser
 
 
@@ -34,9 +36,8 @@ def infer_on_stream(args):
     result = face_detection.check_model()
 
     # Draw face and write an image in the disk
-    face_detection.preprocess_output(result, frame, args.prob_threshold, True)
-
-    print(result)
+    frame, face_boxes = face_detection.preprocess_output(
+        result, frame, args.prob_threshold, args.debug)
 
 
 def main():
