@@ -2,6 +2,7 @@
 This is a sample class for a model. You may choose to use it as-is or make any changes to it.
 This has been provided just to give you an idea of how to structure your model class.
 '''
+import cv2
 from openvino.inference_engine import IENetwork, IECore
 
 
@@ -61,21 +62,30 @@ class Model_Face_Detection:
         TODO: You will need to complete this method.
         This method is meant for running predictions on the input image.
         '''
-        raise NotImplementedError
+        p_image = self.preprocess_input(image)
+
+        self.infer_request = self.exec_network.start_async(
+            request_id=0, inputs={self.input_blob: p_image})
+        return
 
     def check_model(self):
-        raise NotImplementedError
+        if self.infer_request.wait() == 0:
+            result = self.infer_request.outputs[self.output_blob]
+            return result
 
     def preprocess_input(self, image):
-    '''
-    Before feeding the data into the model for inference,
-    you might have to preprocess it. This function is where you can do that.
-    '''
-    raise NotImplementedError
+        '''
+        Before feeding the data into the model for inference,
+        you might have to preprocess it. This function is where you can do that.
+        '''
+        net_input_shape = self.exec_network.inputs[self.input_blob].shape
+        p_frame = cv2.resize(image, (net_input_shape[3], net_input_shape[2]))
+        p_frame = p_frame.transpose((2, 0, 1))
+        p_frame = p_frame.reshape(1, *p_frame.shape)
+        return p_frame
 
-    def preprocess_output(self, outputs):
-    '''
-    Before feeding the output of this model to the next model,
-    you might have to preprocess the output. This function is where you can do that.
-    '''
-    raise NotImplementedError
+    def preprocess_output(self, outputs, frame):
+        '''
+        Before feeding the output of this model to the next model,
+        you might have to preprocess the output. This function is where you can do that.
+        '''
