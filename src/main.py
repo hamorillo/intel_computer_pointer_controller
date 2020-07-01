@@ -4,23 +4,6 @@ from input_feeder import InputFeeder
 from face_detection import Model_Face_Detection
 
 
-def draw_boxes(frame, result, args, width, height):
-    '''
-    Draw bounding boxes onto the frame.
-    '''
-    for box in result[0][0]:  # Output shape is 1x1x100x7
-        conf = box[2]
-        if conf >= args.prob_threshold:
-            xmin = int(box[3] * width)
-            ymin = int(box[4] * height)
-            xmax = int(box[5] * width)
-            ymax = int(box[6] * height)
-            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 1)
-    
-    cv2.imwrite("./output.jpg", frame)
-    return frame
-
-
 def build_argparser():
     """
     Parse command line arguments.
@@ -51,9 +34,7 @@ def infer_on_stream(args):
     result = face_detection.check_model()
 
     # Draw face and write an image in the disk
-    # drawed_frame = draw_boxes(
-    #     frame, result, args, int(input_feeder.cap.get(3)),
-    #     int(input_feeder.cap.get(4)))
+    face_detection.preprocess_output(result, frame, args.prob_threshold, True)
 
     print(result)
 

@@ -84,8 +84,26 @@ class Model_Face_Detection:
         p_frame = p_frame.reshape(1, *p_frame.shape)
         return p_frame
 
-    def preprocess_output(self, outputs, frame):
+    def preprocess_output(self, outputs, frame, threshold, save_img=False):
         '''
         Before feeding the output of this model to the next model,
         you might have to preprocess the output. This function is where you can do that.
         '''
+        height = frame.shape[0]
+        width = frame.shape[1]
+        face_boxes = []
+        for box in outputs[0][0]:  # Output shape is 1x1x100x7
+            conf = box[2]
+            if conf >= threshold:
+                xmin = int(box[3] * width)
+                ymin = int(box[4] * height)
+                xmax = int(box[5] * width)
+                ymax = int(box[6] * height)
+                face_boxes.append([xmin, ymin, xmax, ymax])
+
+                if(save_img):
+                    cv2.rectangle(frame, (xmin, ymin),
+                                  (xmax, ymax), (0, 0, 255), 1)
+
+                    cv2.imwrite("./output.jpg", frame)
+        return frame, face_boxes
