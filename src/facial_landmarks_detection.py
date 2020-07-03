@@ -98,12 +98,13 @@ class Model_Facial_LandMarks_Detection:
         right_eye = [outputs[2]*width, outputs[3]*height]
 
         if(save_img):
+            eyes_to_draw = eyes_frame.copy()
             cv2.circle(
-                eyes_frame, (int(left_eye[0]), int(
-                    left_eye[1])), 30, (0, 255, 255), 2)
+                eyes_to_draw, (int(left_eye[0]), int(
+                    left_eye[1])), 25, (255, 255, 255), 2)
             cv2.circle(
-                eyes_frame, (int(right_eye[0]), int(
-                    right_eye[1])), 30, (0, 255, 255), 2)
-            cv2.imwrite("./eyes.jpg", eyes_frame)
+                eyes_to_draw, (int(right_eye[0]), int(
+                    right_eye[1])), 25, (255, 255, 255), 2)
+            cv2.imwrite("./eyes.jpg", eyes_to_draw)
 
-        return eyes_frame, left_eye, right_eye
+        return eyes_to_draw, left_eye, right_eye
