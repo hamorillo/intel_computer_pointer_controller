@@ -2,6 +2,7 @@
 This is a sample class for a model. You may choose to use it as-is or make any changes to it.
 This has been provided just to give you an idea of how to structure your model class.
 '''
+import time
 import cv2
 from openvino.inference_engine import IENetwork, IECore
 
@@ -49,7 +50,10 @@ class Model_Head_Pose_Estimation:
             self.plugin.add_extension(self.cpu_extensions, self.device)
 
         # Load the IENetwork (model) into the plugin
+        start_time = time.time()
         self.exec_network = self.plugin.load_network(self.network, self.device)
+        print("-> Head pose estimation load time: " +
+              str(time.time()-start_time) + "s")
 
         # Get the input layer
         self.input_blob = next(iter(self.network.inputs))
