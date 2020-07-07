@@ -12,6 +12,8 @@ class Model_Head_Pose_Estimation:
     Class for the Face Detection Model.
     '''
 
+    infer_times = []
+
     def __init__(self, model_name, device='CPU', extensions=None):
         '''
         TODO: Use this to set your instance variables.
@@ -73,6 +75,7 @@ class Model_Head_Pose_Estimation:
 
     def check_model(self):
         if self.infer_request.wait() == 0:
+            self.infer_times.append(self.infer_request.latency)
             result = self.infer_request.outputs
             return result
 

@@ -11,6 +11,7 @@ class Model_Face_Detection:
     '''
     Class for the Face Detection Model.
     '''
+    infer_times = []
 
     def __init__(self, model_name, device='CPU', extensions=None):
         '''
@@ -74,6 +75,7 @@ class Model_Face_Detection:
 
     def check_model(self):
         if self.infer_request.wait() == 0:
+            self.infer_times.append(self.infer_request.latency)
             result = self.infer_request.outputs[self.output_blob]
             return result
 
