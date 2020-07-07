@@ -84,3 +84,7 @@ One of the edge cases that I found is threating with the eyes position and extra
 
 ### Video and Webcam
 The application works either with a video file input and the webcam. You could use the `INPUT_TYPE` parameter in order to select what kind of input do you want to use.
+
+### Packaging the app
+
+The ideal way to distribute is use the OpenVINO™ Deployment Manager but it's only supported by Linux or Windows. On the MacOS package is not present.
