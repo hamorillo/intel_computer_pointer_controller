@@ -4,6 +4,7 @@ This has been provided just to give you an idea of how to structure your model c
 '''
 import time
 import cv2
+import logging as log
 from openvino.inference_engine import IENetwork, IECore
 
 
@@ -43,8 +44,8 @@ class Model_Head_Pose_Estimation:
         unsupported_layers = [
             l for l in self.network.layers.keys() if l not in supported_layers]
         if len(unsupported_layers) != 0:
-            print("Unsupported layers found: {}".format(unsupported_layers))
-            print("Check whether extensions are available to add to IECore.")
+            log.error("Unsupported layers found: {}".format(unsupported_layers))
+            log.error("Check whether extensions are available to add to IECore.")
             exit(1)
 
         # Add extension if it has been specified and we are executing in that device
@@ -54,8 +55,8 @@ class Model_Head_Pose_Estimation:
         # Load the IENetwork (model) into the plugin
         start_time = time.time()
         self.exec_network = self.plugin.load_network(self.network, self.device)
-        print("-> Head pose estimation load time: " +
-              str(time.time()-start_time) + "s")
+        log.info("-> Head pose estimation load time: " +
+                 str(time.time()-start_time) + "s")
 
         # Get the input layer
         self.input_blob = next(iter(self.network.inputs))

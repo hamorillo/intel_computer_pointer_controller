@@ -1,5 +1,6 @@
 import cv2
 import statistics
+import logging as log
 from mouse_controller import MouseController
 from argparse import ArgumentParser
 from input_feeder import InputFeeder
@@ -7,6 +8,11 @@ from face_detection import Model_Face_Detection
 from facial_landmarks_detection import Model_Facial_LandMarks_Detection
 from head_pose_estimation import Model_Head_Pose_Estimation
 from gaze_estimation import Model_Gaze_Estimation
+
+
+def init_logger(debug):
+    if(debug):        
+        log.getLogger().setLevel(log.NOTSET)
 
 
 def build_argparser():
@@ -39,14 +45,19 @@ def build_argparser():
 
 def print_statistics(face_detection, landmark_model, head_pose_model,
                      gaze_estimation_model):
-    print("Face Detection Average Infer Time:" +
-          str(statistics.mean(face_detection.infer_times))+"ms")
-    print("Landmark Average Infer Time:" +
-          str(statistics.mean(landmark_model.infer_times))+"ms")
-    print("Head Pose Average Infer Time:" +
-          str(statistics.mean(head_pose_model.infer_times))+"ms")
-    print("Gaze Average Infer Time:" +
-          str(statistics.mean(gaze_estimation_model.infer_times))+"ms")
+
+    try:
+        log.info("Face Detection Average Infer Time:" +
+                 str(statistics.mean(face_detection.infer_times))+"ms")
+        log.info("Landmark Average Infer Time:" +
+                 str(statistics.mean(landmark_model.infer_times))+"ms")
+        log.info("Head Pose Average Infer Time:" +
+                 str(statistics.mean(head_pose_model.infer_times))+"ms")
+        log.info("Gaze Average Infer Time:" +
+                 str(statistics.mean(gaze_estimation_model.infer_times))+"ms")
+    except statistics.StatisticsError as ex:
+        log.error("Impossible to calculate statistics")
+        log.error(ex)
 
 
 def infer_on_stream(args):
@@ -61,15 +72,22 @@ def infer_on_stream(args):
     head_pose_model = Model_Head_Pose_Estimation(args.head_pose_model)
     gaze_estimation_model = Model_Gaze_Estimation(args.gaze_estimation_model)
 
-    face_detection.load_model()
-    landmark_model.load_model()
-    head_pose_model.load_model()
-    gaze_estimation_model.load_model()
+    try:
+        face_detection.load_model()
+        landmark_model.load_model()
+        head_pose_model.load_model()
+        gaze_estimation_model.load_model()
+    except Exception as ex:
+        log.error("Unabled to load some of the needed models,"
+                  " please review the paths")
+        log.error(ex)
+        return
 
     while(True):
         frame = next(input_feeder.next_batch())
 
         if(frame is None):
+            log.info("No more frames")
             break
 
         face_detection.predict(frame)
@@ -97,7 +115,7 @@ def infer_on_stream(args):
                     gaze_result['gaze_vector'][0][1])
 
     print_statistics(face_detection, landmark_model, head_pose_model,
-                     gaze_estimation_model)
+                         gaze_estimation_model)
 
 
 def main():
@@ -108,6 +126,8 @@ def main():
     """
     # Grab command line args
     args = build_argparser().parse_args()
+    # Init logger
+    init_logger(args.debug)
     # Perform inference
     infer_on_stream(args)
 

@@ -8,6 +8,7 @@ Sample usage:
     feed.close()
 '''
 import cv2
+import logging as log
 from numpy import ndarray
 
 
@@ -25,6 +26,9 @@ class InputFeeder:
     def load_data(self):
         if self.input_type == 'video':
             self.cap = cv2.VideoCapture(self.input_file)
+            if(self.cap.isOpened() is False):
+                log.error("Error opening video stream or file")
+                exit(1)
         elif self.input_type == 'cam':
             self.cap = cv2.VideoCapture(0)
         else:

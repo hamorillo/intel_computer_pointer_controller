@@ -88,3 +88,7 @@ The application works either with a video file input and the webcam. You could u
 ### Packaging the app
 
 The ideal way to distribute is use the OpenVINO™ Deployment Manager but it's only supported by Linux or Windows. On the MacOS package is not present.
+
+### Logging important events
+
+I'm using try/except block to identify some errors or important events in the app execution and log it using `logging`. This makes easy the use of the application to a user when a problem occurred.
